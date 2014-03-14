@@ -1,0 +1,138 @@
+<html>
+
+<head>
+	<title>BezierCurve.js - Sunmock Yang</title>
+	<style>
+		body{
+			text-align: center;
+			background-color: #333;
+			font-family: Arial;
+			font-size: 12px;
+			text-decoration: none;
+			color: #FFF;
+		}
+		
+		canvas{
+			z-index: 1;
+			margin-top:5%;
+		}
+		
+		a{
+			color: #999;
+			text-decoration: none;
+			cursor: pointer;
+		}
+		a:hover{
+			color:#9FF;
+		}
+
+		#credit{
+			right: 10px;
+			position: absolute;
+			bottom: 10px;
+		}
+		
+		#project{
+			left: 10px;
+			position: absolute;
+			bottom: 10px;
+		}
+
+		#description{
+
+		}
+	</style>
+</head>
+
+<body>
+
+	<canvas id="canvas" style="border: solid grey 2px" width="600px" height="600px">
+		YOUR BROWSER IS TOO POOR
+	</canvas>
+	<div id="description">
+	Press space to toggle control points. Left/Right to choose which point to control.
+	<br/>
+	Adjustables: 
+	<a onclick="var b = prompt('Resolution', '20'); globs.curve.resolution = ((b !== null) ? Number(b) : 20); globs.curve.draw();">Resolution</a>
+	<a onclick="var b = prompt('Number of Points', '5'); populatePoints((b !== null) ? Number(b) : 5); globs.curve.draw();">Number of Points</a>
+	</div>
+
+	<div id="project">BezierCurve.js</div>
+	<a id="credit" href="http://sunmock.com">Sunmock Yang, Oct. 2013</a>
+
+	<script>
+		var globs = {
+			canvas: null,
+			context: null,
+
+			cWidth: -1,
+			cHeight: -1,
+
+			points: [],
+			ctrIndex: 1,
+
+			debug: true,
+
+			curve: null
+		}
+
+
+		function main(){
+			globs.canvas = document.getElementById('canvas');
+			globs.context = globs.canvas.getContext("2d");
+
+			BezierCurve.prototype.context = globs.context;
+
+			globs.cWidth = globs.canvas.width;
+			globs.cHeight = globs.canvas.height;
+			globs.curve = new BezierCurve();
+
+			populatePoints(5);
+
+			globs.mouse = new LibraryMouse(globs.canvas);
+			globs.mouse.addEventListener("mousemove", function(){
+
+				var i = globs.ctrIndex;
+				globs.curve.points[i].x = globs.mouse.x;
+				globs.curve.points[i].y = globs.mouse.y;
+
+				globs.curve.draw();
+			});
+
+			globs.curve.draw();
+		}
+
+		function populatePoints(n){
+			globs.curve.points = [];
+			for (var i = 0; i < n; i++) {
+				globs.curve.points.push(new Point(Math.random() * 600, Math.random() * 600));
+			};
+		}
+
+		document.onkeydown = function(e){
+			switch(e.keyCode){
+				case 32:
+					globs.debug = !globs.debug;
+				break;
+
+				case 39:
+					globs.ctrIndex = (globs.ctrIndex+1) % globs.curve.points.length;
+				break;
+
+				case 37:
+					var n = globs.curve.points.length;
+					globs.ctrIndex = (((globs.ctrIndex-1) % n) + n) % n;
+				break;
+			}
+
+			globs.curve.draw();
+		}
+
+		window.onload = main;
+	</script>
+
+	<script type="text/javascript" src="BezierCurve.js"></script>
+	<script type="text/javascript" src="LibraryMouse.min.js"></script>
+</body>
+
+</html>
